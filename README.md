@@ -32,7 +32,7 @@ DATABASE_URL=
 
 ## Instalación
 ```bash
-git clone https://github.com/tu-usuario/hotel-system-backend
+git clone https://github.com/JovanyMolina/hotel-system-backend
 cd hotel-system-backend
 npm install
 npx prisma migrate dev
