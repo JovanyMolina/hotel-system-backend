@@ -1,0 +1,238 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ============================================
+// USUARIOS Y AUTENTICACIÓN
+// ============================================
+
+enum RolUsuario {
+  ADMIN
+  RECEPCIONISTA
+}
+
+model Usuario {
+  id        String   @id @default(cuid())
+  nombre    String
+  email     String   @unique
+  password  String
+  rol       RolUsuario @default(RECEPCIONISTA)
+  activo    Boolean  @default(true)
+  creadoEn  DateTime @default(now())
+  
+  reservas  Reserva[]
+  auditoria AuditLog[]
+
+  @@map("usuarios")
+}
+
+// ============================================
+// CONFIGURACIÓN DEL HOTEL
+// ============================================
+
+model ConfiguracionHotel {
+  id                String   @id @default(cuid())
+  nombre            String
+  descripcion       String?
+  telefono          String?
+  email             String?
+  direccion         String?
+  ciudad            String?
+  pais              String?
+  logoUrl           String?
+  sitioWeb          String?
+  checkInHora       String   @default("14:00")
+  checkOutHora      String   @default("12:00")
+  moneda            String   @default("MXN")
+  politicaCancelacion String?
+  actualizadoEn     DateTime @updatedAt
+
+  @@map("configuracion_hotel")
+}
+
+// ============================================
+// SERVICIOS ADICIONALES
+// ============================================
+
+model Servicio {
+  id          String   @id @default(cuid())
+  nombre      String
+  descripcion String?
+  activo      Boolean  @default(true)
+  creadoEn    DateTime @default(now())
+
+  @@map("servicios")
+}
+
+// ============================================
+// HABITACIONES
+// ============================================
+
+enum TipoHabitacion {
+  SENCILLA
+  DOBLE
+  SUITE
+  PENTHOUSE
+}
+
+enum EstadoHabitacion {
+  DISPONIBLE
+  OCUPADA
+  MANTENIMIENTO
+  BLOQUEADA
+}
+
+model Habitacion {
+  id           String           @id @default(cuid())
+  numero       String           @unique
+  piso         Int
+  tipo         TipoHabitacion
+  capacidad    Int              @default(2)
+  precioNoche  Float
+  descripcion  String?
+  amenidades   String[]
+  imagenes     String[]
+  estado       EstadoHabitacion @default(DISPONIBLE)
+  activa       Boolean          @default(true)
+  creadoEn     DateTime         @default(now())
+  actualizadoEn DateTime        @updatedAt
+
+  reservas     Reserva[]
+  bloqueos     BloqueoTemporal[]
+
+  @@map("habitaciones")
+}
+
+// ============================================
+// BLOQUEO TEMPORAL (sistema tipo cine)
+// ============================================
+
+model BloqueoTemporal {
+  id           String   @id @default(cuid())
+  habitacionId String
+  usuarioId    String
+  expiraEn     DateTime
+  creadoEn     DateTime @default(now())
+
+  habitacion   Habitacion @relation(fields: [habitacionId], references: [id])
+
+  @@map("bloqueos_temporales")
+}
+
+// ============================================
+// HUÉSPEDES
+// ============================================
+
+model Huesped {
+  id            String   @id @default(cuid())
+  nombre        String
+  apellido      String
+  email         String?  @unique
+  telefono      String?
+  documento     String?
+  tipoDocumento String?
+  nacionalidad  String?
+  notas         String?
+  esVip         Boolean  @default(false)
+  creadoEn      DateTime @default(now())
+  actualizadoEn DateTime @updatedAt
+
+  reservas      Reserva[]
+
+  @@map("huespedes")
+}
+
+// ============================================
+// RESERVAS
+// ============================================
+
+enum EstadoReserva {
+  PENDIENTE
+  CONFIRMADA
+  CHECKIN
+  CHECKOUT
+  CANCELADA
+}
+
+model Reserva {
+  id             String        @id @default(cuid())
+  codigoReserva  String        @unique @default(cuid())
+  huespedId      String
+  habitacionId   String
+  usuarioId      String
+  fechaEntrada   DateTime
+  fechaSalida    DateTime
+  noches         Int
+  precioNoche    Float
+  totalPagar     Float
+  estado         EstadoReserva @default(PENDIENTE)
+  notas          String?
+  creadoEn       DateTime      @default(now())
+  actualizadoEn  DateTime      @updatedAt
+
+  huesped        Huesped    @relation(fields: [huespedId], references: [id])
+  habitacion     Habitacion @relation(fields: [habitacionId], references: [id])
+  usuario        Usuario    @relation(fields: [usuarioId], references: [id])
+  pagos          Pago[]
+
+  @@map("reservas")
+}
+
+// ============================================
+// PAGOS
+// ============================================
+
+enum EstadoPago {
+  PENDIENTE
+  PAGADO
+  FALLIDO
+  REEMBOLSADO
+}
+
+enum MetodoPago {
+  EFECTIVO
+  TARJETA
+  TRANSFERENCIA
+  OTRO
+}
+
+model Pago {
+  id         String     @id @default(cuid())
+  reservaId  String
+  monto      Float
+  metodo     MetodoPago
+  estado     EstadoPago @default(PENDIENTE)
+  referencia String?
+  notas      String?
+  fechaPago  DateTime   @default(now())
+
+  reserva    Reserva @relation(fields: [reservaId], references: [id])
+
+  @@map("pagos")
+}
+
+// ============================================
+// AUDITORÍA
+// ============================================
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  usuarioId  String?
+  accion     String
+  modulo     String
+  descripcion String
+  datosAntes Json?
+  datosDespues Json?
+  ip         String?
+  creadoEn   DateTime @default(now())
+
+  usuario    Usuario? @relation(fields: [usuarioId], references: [id])
+
+  @@map("audit_log")
+}
