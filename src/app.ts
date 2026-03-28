@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import { createServer } from 'http'
 import authRoutes from './routes/auth.routes'
 import habitacionRoutes from './routes/habitacion.routes'
+import huespedRoutes from './routes/huesped.routes'
 
 
 dotenv.config()
@@ -16,8 +17,8 @@ app.use(express.json())
 
 // Rutas
 app.use('/api/auth', authRoutes)
-app.use('/api/auth', authRoutes)
 app.use('/api/habitaciones', habitacionRoutes)
+app.use('/api/huespedes', huespedRoutes)
 
 // Health check
 app.get('/health', (_req, res) => {
