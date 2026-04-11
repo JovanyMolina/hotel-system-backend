@@ -8,6 +8,7 @@ import huespedRoutes from './routes/huesped.routes'
 import reservaRoutes from './routes/reserva.routes'
 import bloqueosRoutes from './routes/bloqueos.routes'
 import { iniciarSockets } from './sockets/index'
+import dashboardRoutes from './routes/dashboard.routes'
 
 dotenv.config()
 
@@ -23,6 +24,7 @@ app.use('/api/habitaciones', habitacionRoutes)
 app.use('/api/huespedes', huespedRoutes)
 app.use('/api/reservas', reservaRoutes)
 app.use('/api/bloqueos', bloqueosRoutes)
+app.use('/api/dashboard', dashboardRoutes)
 
 // Health check
 app.get('/health', (_req, res) => {
