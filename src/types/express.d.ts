@@ -14,3 +14,5 @@ declare global {
 }
 
 export {};
+
+// TODO: Ser que es socket conectado y desconectado

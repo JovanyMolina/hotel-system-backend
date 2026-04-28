@@ -89,22 +89,26 @@ enum EstadoHabitacion {
 }
 
 model Habitacion {
-  id           String           @id @default(cuid())
-  numero       String           @unique
-  piso         Int
-  tipo         TipoHabitacion
-  capacidad    Int              @default(2)
-  precioNoche  Float
-  descripcion  String?
-  amenidades   String[]
-  imagenes     String[]
-  estado       EstadoHabitacion @default(DISPONIBLE)
-  activa       Boolean          @default(true)
-  creadoEn     DateTime         @default(now())
-  actualizadoEn DateTime        @updatedAt
+  id            String           @id @default(cuid())
+  numero        String           @unique
+  piso          Int
+  tipo          TipoHabitacion
+  capacidad     Int              @default(2)
+  tamano        Float?
+  cantidadCamas Int?
+  vista         String?
+  tipoCama      String?
+  precioNoche   Float
+  descripcion   String?
+  amenidades    String[]
+  imagenes      String[]
+  estado        EstadoHabitacion @default(DISPONIBLE)
+  activa        Boolean          @default(true)
+  creadoEn      DateTime         @default(now())
+  actualizadoEn DateTime         @updatedAt
 
-  reservas     Reserva[]
-  bloqueos     BloqueoTemporal[]
+  reservas  Reserva[]
+  bloqueos  BloqueoTemporal[]
 
   @@map("habitaciones")
 }
