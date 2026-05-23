@@ -23,9 +23,14 @@ API REST para el sistema de gestión hotelera.
 
 ## Variables de entorno
 
-Crea un archivo `.env` basado en `.env.example`:
+Crea un archivo `.env` con lo siguiente:
 ```env
 DATABASE_URL=
+DIRECT_URL=
+JWT_SECRET=
+JWT_EXPIRES_IN=
+PORT=
+FRONTEND_URL=
 ```
 
 ---
@@ -34,7 +39,7 @@ DATABASE_URL=
 ```bash
 git clone https://github.com/JovanyMolina/hotel-system-backend
 cd hotel-system-backend
-npm install
-npx prisma migrate dev
-npm run dev
+pnpm install
+pnpm prisma generate
+pnpm run dev
 ```
